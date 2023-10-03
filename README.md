@@ -1,4 +1,4 @@
-<h1> The code repository for the fake news detection framework </h1>
+<h1> Code repository for Homophily fake news detection framework </h1>
 
 The code is the combination of reproduced code from the two papers: 
 
