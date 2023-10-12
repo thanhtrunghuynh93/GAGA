@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 import torch
 import torch.nn as nn
 import numpy as np
-
+import pickle
 
 def build_vocabs(train_data):
 
@@ -68,9 +68,10 @@ def collate_batch(batch):
         evd_mask_list,
         n_evd_list,
         label_list,
-    ) = ([], [], [], [], [], [], [], [])
+        orig_left_id_list,
+    ) = ([], [], [], [], [], [], [], [], [])
 
-    for query, query_adj, query_mask, evds, evd_adjs, evd_masks, n_evds, label in batch:
+    for query, query_adj, query_mask, evds, evd_adjs, evd_masks, n_evds, label, orig_left_id in batch:
         query_list.append(query)
         query_adj_list.append(query_adj)
         query_mask_list.append(query_mask)
@@ -79,6 +80,7 @@ def collate_batch(batch):
         evd_mask_list.append(evd_masks)
         n_evd_list.append(n_evds)
         label_list.append(label)
+        orig_left_id_list.append(orig_left_id)
 
     query_list = torch.LongTensor(np.stack(query_list))
     query_adj_list = torch.FloatTensor(np.stack(query_adj_list))
@@ -90,6 +92,7 @@ def collate_batch(batch):
 
     n_evd_list = torch.LongTensor(n_evd_list)
     label_list = torch.LongTensor(label_list)
+    orig_left_id_list = torch.LongTensor(orig_left_id_list)
     return (
         query_list,
         query_adj_list,
@@ -98,7 +101,7 @@ def collate_batch(batch):
         evd_adj_list,
         evd_mask_list,
         n_evd_list,
-    ), label_list
+    ), label_list, orig_left_id_list
 
 
 def main(args):
@@ -165,7 +168,7 @@ def main(args):
 
     for epoch in range(args.epochs):
         total_loss = 0
-        for x, y in tqdm(train_loader):
+        for x, y, _ in tqdm(train_loader):
             x = tuple([i.cuda() for i in x])
             y = y.cuda()
             _, logits = get_model(*x)
@@ -180,27 +183,32 @@ def main(args):
     get_model.eval()
 
     with torch.no_grad():
-        all_logits = []
-        all_trues = []
-        embeddings = []
-        for x, y in tqdm(dev_loader):
-            x = tuple([i.cuda() for i in x])
-            y = y.cuda()
-            embeddings_, logits = get_model(*x)
-            all_logits.append(logits)
-            all_trues.append(y)
-            embeddings.append(embeddings_)
+        embeddings = {}
+        for loader in [train_loader, dev_loader, test_loader]:
+            all_logits = []
+            all_trues = []
+            for x, y, ori_ids in tqdm(loader):
+                x = tuple([i.cuda() for i in x])
+                y = y.cuda()
+                embs, logits = get_model(*x)
+                all_logits.append(logits)
+                all_trues.append(y)
 
-    all_trues = torch.cat(all_trues).detach().cpu().numpy()
-    all_logits = torch.cat(all_logits, dim=0)
-    embeddings = torch.cat(embeddings, dim=0)
-    predicts = all_logits.argmax(dim=1).detach().cpu().numpy()
+                embs = embs.cpu().numpy()
+                ori_ids = ori_ids.cpu().numpy()
+                for ori_id, emb in zip(ori_ids, embs):
+                    embeddings[ori_id] = emb 
 
-    print("F1_micro:", f1_score(all_trues, predicts, average="micro"))
-    print("F1_macro:", f1_score(all_trues, predicts, average="macro"))
-    print(embeddings.shape)
+            all_trues = torch.cat(all_trues).detach().cpu().numpy()
+            all_logits = torch.cat(all_logits, dim=0)
+            predicts = all_logits.argmax(dim=1).detach().cpu().numpy()
+
+            print("F1_micro:", f1_score(all_trues, predicts, average="micro"))
+            print("F1_macro:", f1_score(all_trues, predicts, average="macro"))
+
     if args.outpath:
-        np.save(args.outpath, embeddings.cpu().numpy())
+        assert len(embeddings) == len(train_dataset) + len(dev_dataset) + len(test_dataset)
+        pickle.dump(embeddings, open(args.outpath, "wb"))
 
 
 if __name__ == "__main__":

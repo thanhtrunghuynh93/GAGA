@@ -34,10 +34,12 @@ class QueryDataset:
     def _read_text(self, df):
         self.claim_evidences = defaultdict(list)
         self.claim_ids = {}
+        self.original_claim_ids = []
         self.claim_texts, self.labels = [], []
         for i, (_, row) in tqdm(enumerate(df.iterrows()), desc="Read text"):
             if row.id_left not in self.claim_ids:
                 self.claim_ids[row.id_left] = len(self.claim_ids)
+                self.original_claim_ids.append(row.id_left)
                 self.claim_texts.append(row.claim_text)
                 self.labels.append(row.cred_label)
             self.claim_evidences[self.claim_ids[row.id_left]].append(i)
@@ -166,6 +168,7 @@ class QueryTorchDataset(torch.utils.data.Dataset):
         self.evd_text = data.evd_text
         self.evd_adj = data.evd_adj
         self.labels = data.labels
+        self.orig_left_ids = data.original_claim_ids
         self.claim_evidences = data.claim_evidences
         self.n_evd_per_claim = n_evd_per_claim
 
@@ -177,6 +180,7 @@ class QueryTorchDataset(torch.utils.data.Dataset):
         query_adj = self.claim_adj[idx]
         query_mask = self._text_to_mask(query)
         label = self.labels[idx]
+        orig_left_id = self.orig_left_ids[idx]
         n_evds = len(self.claim_evidences[idx])
         evds, evd_adjs, evd_masks = [], [], []
         for evd_idx in self.claim_evidences[idx]:
@@ -187,7 +191,7 @@ class QueryTorchDataset(torch.utils.data.Dataset):
         evd_adjs = np.stack(evd_adjs)
         evd_masks = np.stack(evd_masks)
 
-        return query, query_adj, query_mask, evds, evd_adjs, evd_masks, n_evds, label
+        return query, query_adj, query_mask, evds, evd_adjs, evd_masks, n_evds, label, orig_left_id
 
     def __len__(self):
         return len(self.labels)
