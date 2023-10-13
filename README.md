@@ -9,7 +9,8 @@ GAGA: Label Information Enhanced Fraud Detection against Low Homophily in Graphs
 Unzip the data and preprocessed data, the run file are in the folders
 
 # How to run
-## Get embeddings fron GET
+## Step by stepp
+### Get embeddings fron GET
 1. Go to https://nlp.stanford.edu/projects/glove/ to download glove embedding file and put it into `data/glove/embedding`
 2. Run `Simplified_GET/main.py` to get the embedding of each claim. We save them as a dictionary in pickle format.
 ``` bash
@@ -23,7 +24,7 @@ python3 Simplified_GET/main.py \
 --outpath data/embeddings/embeddings_Snopes_0.pkl
 ```
 
-## Build the graphs
+### Build the graphs
 1. Run `graph4GAGA.py` to build the dgl graphs and save them into binary files. The `--train_file`, `--test_file`, `--dev_file` must be the same as the first step, while the `--embedding_file` must be the same as `--outpath` in the first step. For example
 ``` bash
 python3 graph4GAGA.py \
@@ -47,7 +48,7 @@ Then 4 graphs are created with different subset of edge types:
 - `mutual_evd`, `np`
 - `mutual_evd`
 
-## Run GAGA
+### Run GAGA
 1. Create the graph sequence from the binary graph file by `GAGA/pytorch_gaga/preprocessing/graph2seq_mp.py`
 ```bash
 python3 GAGA/pytorch_gaga/preprocessing/dataset_split.py --dataset data/graphs/Snopes_0 --save_dir data/gaga_sequence_data/ --graph_id 0
@@ -61,3 +62,9 @@ Note that we don't use `--train_size`, `--val_size` since we use the benchmark t
 ```bash
 python3 GAGA/pytorch_gaga/main_transformer.py --config GAGA/pytorch_gaga/configs/Snopes_0_0.json --gpu 0  --log_dir logs --early_stop 100 --seeds 1 2 3
 ```
+
+## All at once
+You can modify and run `run.sh` to do all above steps. 
+
+# TODO:
+Add creating the sentiment edges (`1-1`, `0-0`, `1-0`, `0-1`) as an option since running the NLI model is heavy and takes time.
