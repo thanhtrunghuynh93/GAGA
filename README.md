@@ -6,11 +6,9 @@ GET: Evidence-aware Fake News Detection with Graph Neural Networks (<a href = "h
 
 GAGA: Label Information Enhanced Fraud Detection against Low Homophily in Graphs (<a href = "https://arxiv.org/pdf/2302.10407.pdf"> link </a>)
 
-Unzip the data and preprocessed data, the run file are in the folders
-
 # How to run
-## Step by stepp
-### Get embeddings fron GET
+## Step by step
+### Get embeddings from GET
 1. Go to https://nlp.stanford.edu/projects/glove/ to download glove embedding file and put it into `data/glove/embedding`
 2. Run `Simplified_GET/main.py` to get the embedding of each claim. We save them as a dictionary in pickle format.
 ``` bash
@@ -42,7 +40,7 @@ We consider 6 directed edge types:
 - `0-0`: Two claims are not supported by an evidence source
 - `np`: Two claims have at least one common noun phrase
 
-Then 4 graphs are created with different subset of edge types:
+Then 4 graphs are created with different subsets of edge types:
 - `1-1`, `0-0`, `1-0`,`0-1`, `np`
 - `1-1`, `0-0`, `1-0`,`0-1`, `np`
 - `mutual_evd`, `np`
@@ -64,7 +62,7 @@ python3 GAGA/pytorch_gaga/main_transformer.py --config GAGA/pytorch_gaga/configs
 ```
 
 ## All at once
-You can modify and run `run.sh` to do all above steps. 
+You can modify and run `run.sh` to do all the above steps. 
 
 # TODO:
 Add creating the sentiment edges (`1-1`, `0-0`, `1-0`, `0-1`) as an option since running the NLI model is heavy and takes time.
