@@ -20,12 +20,10 @@ def main(args):
     df = pd.concat([df_train, df_test, df_dev])
 
 
-    # nli_model = AutoModelForSequenceClassification.from_pretrained('facebook/bart-large-mnli').cuda()
-    # tokenizer = AutoTokenizer.from_pretrained('facebook/bart-large-mnli')
+    nli_model = AutoModelForSequenceClassification.from_pretrained('facebook/bart-large-mnli').cuda()
+    tokenizer = AutoTokenizer.from_pretrained('facebook/bart-large-mnli')
 
     def score(sequence1, sequence2):
-        import random
-        return random.random()
         # run through model pre-trained on MNLI
         x = tokenizer.encode(sequence1, sequence2, return_tensors='pt',
                         truncation_strategy='only_first')
