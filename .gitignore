@@ -1,6 +1,11 @@
 # Data files
 *.npy
 *.pkl
+*.bin
+data/glove_embedding/glove.6B.100d.txt
+
+# Notebook file
+*.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
