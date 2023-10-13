@@ -217,25 +217,25 @@ if __name__ == "__main__":
         "--train_file",
         type=str,
         help="TSV train file in GET folder",
-        default="/home/hoangdzung/Documents/EPFL/fakenews/GET//formatted_data/declare/Snopes/mapped_data/5fold/train_0.tsv",
+        default="data/formatted_data/declare/Snopes/mapped_data/5fold/train_0.tsv",
     )
     parser.add_argument(
         "--test_file",
         type=str,
         help="TSV test file in GET folder",
-        default="/home/hoangdzung/Documents/EPFL/fakenews/GET//formatted_data/declare/Snopes/mapped_data/5fold/test_0.tsv",
+        default="data/formatted_data/declare/Snopes/mapped_data/5fold/test_0.tsv",
     )
     parser.add_argument(
         "--dev_file",
         type=str,
         help="TSV dev file in GET folder",
-        default="/home/hoangdzung/Documents/EPFL/fakenews/GET//formatted_data/declare/Snopes/mapped_data/dev.tsv",
+        default="data/formatted_data/declare/Snopes/mapped_data/dev.tsv",
     )
     parser.add_argument(
         "--glove_path",
         type=str,
         help="Path to glove embedding file",
-        default="/home/hoangdzung/Downloads/glove.6B/glove.6B.100d.txt",
+        default="data/glove_embedding/glove.6B.100d.txt",
     )
     parser.add_argument(
         "--hidden_dim", type=int, default=300, help="Hidden dim, default=300"
