@@ -3,6 +3,7 @@
 *.pkl
 *.bin
 data/glove_embedding/glove.6B.100d.txt
+logs 
 
 # Notebook file
 *.ipynb
