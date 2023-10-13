@@ -1,5 +1,5 @@
 ## GAGA: Label Information Enhanced Fraud Detection against Low Homophily in Graphs (WWW '23)
-### Only use this one for reference since the code is modified already!!!
+### Only use this README for reference since the code is modified already!!!
 
 The PyTorch implementation of GAGA.
 
